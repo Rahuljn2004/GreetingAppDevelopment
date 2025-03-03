@@ -1,34 +1,26 @@
 package com.example.GreetingAppDevelopment.controller;
 
-
-import org.springframework.web.bind.annotation.*;
+import com.example.GreetingAppDevelopment.service.GreetingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/greeting")
 public class GreetingController {
 
-    // GET request - Return a simple greeting
+    private final GreetingService greetingService;
+
+    // Constructor-based Dependency Injection
+    @Autowired
+    public GreetingController(GreetingService greetingService) {
+        this.greetingService = greetingService;
+    }
+
+    // GET request - Get greeting message from Service Layer
     @GetMapping
     public String getGreeting() {
-        return "{\"message\": \"Hello, Welcome to Greeting App!\"}";
-    }
-
-    // POST request - Return a greeting with a name
-    @PostMapping
-    public String postGreeting(@RequestParam String name) {
-        return "{\"message\": \"Hello, " + name + "! Welcome to Greeting App!\"}";
-    }
-
-    // PUT request - Update a greeting message
-    @PutMapping
-    public String putGreeting(@RequestParam String name) {
-        return "{\"message\": \"Greeting updated for " + name + "!\"}";
-    }
-
-    // DELETE request - Delete a greeting message
-    @DeleteMapping
-    public String deleteGreeting(@RequestParam String name) {
-        return "{\"message\": \"Greeting deleted for " + name + "!\"}";
+        return "{\"message\": \"" + greetingService.getGreetingMessage() + "\"}";
     }
 }
-
