@@ -1,4 +1,5 @@
 package com.example.GreetingAppDevelopment.controller;
+
 import com.example.GreetingAppDevelopment.dto.GreetingDTO;
 import com.example.GreetingAppDevelopment.dto.UserDTO;
 import com.example.GreetingAppDevelopment.service.IGreetingService;
@@ -35,5 +36,10 @@ public class GreetingController {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         return greetingService.editGreeting(id, user);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteGreeting(@PathVariable(value = "id") long id) {
+        greetingService.deleteGreeting(id);
     }
 }
