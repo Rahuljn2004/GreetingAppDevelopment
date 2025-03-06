@@ -1,35 +1,35 @@
 package com.example.GreetingAppDevelopment.controller;
 
-import com.example.GreetingAppDevelopment.entity.Greeting;
-import com.example.GreetingAppDevelopment.service.GreetingService;
-import org.springframework.http.ResponseEntity;
+import com.example.GreetingAppDevelopment.dto.GreetingDTO;
+import com.example.GreetingAppDevelopment.dto.UserDTO;
+import com.example.GreetingAppDevelopment.service.IGreetingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/greeting")
+@RequestMapping("/greetings")
 public class GreetingController {
-    private final GreetingService greetingService;
+    @Autowired
+    private IGreetingService greetingService;
 
-    public GreetingController(GreetingService greetingService) {
-        this.greetingService = greetingService;
+    @GetMapping("")
+    public GreetingDTO getGreeting(@RequestParam(value = "firstName", defaultValue = "", required = false) String firstName, @RequestParam(value = "lastName", defaultValue = "", required = false) String lastName) {
+        UserDTO user = new UserDTO();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        return greetingService.addGreeting(user);
     }
 
-    @PostMapping
-    public ResponseEntity<Greeting> createGreeting(@RequestBody Greeting greeting) {
-        return ResponseEntity.ok(greetingService.createGreeting(greeting));
-    }
-
-    // ✅ Add this method to handle GET requests
-    @GetMapping
-    public Greeting getGreeting() {
-        return new Greeting("Hello, World!"); // Default greeting
-    }
     @GetMapping("/{id}")
-    public ResponseEntity<Greeting> getGreetingById(@PathVariable Long id) {
-        Optional<Greeting> greeting = greetingService.getGreetingById(id);
-        return greeting.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public GreetingDTO getGreetingById(@PathVariable(value = "id") long id) {
+        return greetingService.getGreetingById(id);
+    }
+
+    @GetMapping("/all")
+    public Iterable<GreetingDTO> getAllGreetings() {
+        return greetingService.getAllGreetings();
     }
 }

@@ -1,30 +1,36 @@
 package com.example.GreetingAppDevelopment.service;
 
-import org.springframework.stereotype.Service;
-
-import com.example.GreetingAppDevelopment.entity.Greeting;
+import com.example.GreetingAppDevelopment.dto.GreetingDTO;
+import com.example.GreetingAppDevelopment.dto.UserDTO;
 import com.example.GreetingAppDevelopment.repository.GreetingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
-public class GreetingService {
-    private final GreetingRepository greetingRepository;
-    public Optional<Greeting> getGreetingById(Long id) {
-        return greetingRepository.findById(id);
+public class GreetingService implements IGreetingService {
+    private static final String template = "Hello, %s!";
+    private final AtomicLong counter = new AtomicLong();
+
+    @Autowired
+    private GreetingRepository greetingRepository;
+
+    @Override
+    public GreetingDTO addGreeting(UserDTO user) {
+        String message = String.format(template, (user.getFirstName().isEmpty() && user.getLastName().isEmpty()) ? "World" : user.getFirstName() + " " + user.getLastName());
+        return greetingRepository.save(new GreetingDTO(counter.incrementAndGet(), message));
     }
 
-    public GreetingService(GreetingRepository greetingRepository) {
-        this.greetingRepository = greetingRepository;
+    @Override
+    public GreetingDTO getGreetingById(long id) {
+        return greetingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Greeting not found with id: " + id));
     }
 
-    public Greeting saveGreeting(String message) {
-        Greeting greeting = new Greeting(message);
-        return greetingRepository.save(greeting);
+    @Override
+    public List<GreetingDTO> getAllGreetings() {
+        return greetingRepository.findAll();
     }
-    public Greeting createGreeting(Greeting greeting) {
-        return greetingRepository.save(greeting);
-    }
-
 }
